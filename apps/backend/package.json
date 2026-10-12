@@ -18,8 +18,8 @@
     "@nathanget/shared-types": "workspace:*",
     "@prisma/client": "^6.1.0",
     "better-auth": "catalog:",
-    "hono": "^4.6.14",
-    "nodemailer": "^9.0.6",
+    "hono": "^4.13.13",
+    "nodemailer": "^10.1.0",
     "zod": "catalog:"
   },
   "devDependencies": {
