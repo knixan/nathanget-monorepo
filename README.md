@@ -30,7 +30,7 @@ Mobil pekar på `EXPO_PUBLIC_API_URL` (default `http://localhost:3001`).
 
 ## Förkrav
 
-- **Node** >= 20
+- **Node** >= 22
 - **pnpm** 9.15.0 (`corepack enable` rekommenderas)
 - En **PostgreSQL**-databas (t.ex. [Neon](https://neon.tech/))
 - Ett **Gmail-konto med app-lösenord** för verifieringsmejl
@@ -77,9 +77,9 @@ pnpm --filter @nathanget/mobile start      # Expo; tryck a / i / w för android 
 | -------------------- | -------------------------------------------------------- |
 | `DATABASE_URL`       | PostgreSQL-connection string (Neon)                      |
 | `PORT`               | Backend-port (default `3001`)                            |
-| `BETTER_AUTH_SECRET` | Hemlig nyckel för Better Auth                            |
+| `BETTER_AUTH_SECRET` | Hemlig nyckel för Better Auth (minst 32 tecken)          |
 | `BETTER_AUTH_URL`    | Backendens publika URL (default `http://localhost:3001`) |
-| `CORS_ORIGINS`       | Kommaseparerade tillåtna origins för frontend-apparna    |
+| `CORS_ORIGINS`       | Tillåtna origins (CORS + Better Auth), kommaseparerade   |
 | `NODE_ENV`           | `development` / `production`                             |
 | `GMAIL_USER`         | Gmail-adress som skickar verifieringsmejl                |
 | `GMAIL_APP_PASSWORD` | Gmail app-lösenord (inte kontolösenordet)                |
@@ -130,6 +130,15 @@ kollar formatering (`prettier --check`), genererar Prisma-klienten och kör `lin
 `typecheck`, `test` och `build` – men bara på de paket som påverkats av ändringen
 (`turbo run ... --filter="...[ref]"`).
 
+Ett separat `security`-jobb kör `prisma validate`, `pnpm audit --prod` (high+) och
+gitleaks (hemlighetsskanning). `.github/workflows/codeql.yml` kör CodeQL vid push, PR
+och varje måndag, och `.github/dependabot.yml` föreslår veckovisa uppdateringar av
+npm-beroenden och GitHub Actions. Pågående CI-körningar för samma ref avbryts när en
+ny push kommer.
+
+Rekommenderat i GitHub: skydda `main` (Settings → Branches) med obligatoriska checks
+och kräv PR – jobben `ci` och `security` samt CodeQL.
+
 ### Köra CI lokalt
 
 Kör samma steg som CI innan du pushar:
@@ -149,3 +158,12 @@ Vill du testa **hela** monorepot oavsett vad som ändrats:
 ```bash
 pnpm format && pnpm turbo run lint typecheck test build
 ```
+
+## Backend-säkerhet
+
+- Säkerhetsheaders (`hono/secure-headers`), max 100 KB request-body och en global
+  felhanterare som inte läcker interna fel.
+- Rate limiting (120 anrop/min per IP) på `/me/*` och `/users/*`; `/auth/*` skyddas av
+  Better Auth. Begränsningen ligger i minnet och räcker för en serverinstans – kör
+  backend bakom en proxy du litar på (IP läses från `x-forwarded-for`).
+- Servern validerar ålder, villkorsgodkännande och `sexAssignedAtBirth` vid registrering.
