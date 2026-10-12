@@ -6,7 +6,7 @@ import { z } from "zod";
  */
 const envSchema = z.object({
   DATABASE_URL: z.string().min(1, "DATABASE_URL saknas"),
-  BETTER_AUTH_SECRET: z.string().min(1, "BETTER_AUTH_SECRET saknas"),
+  BETTER_AUTH_SECRET: z.string().min(32, "BETTER_AUTH_SECRET måste vara minst 32 tecken"),
   BETTER_AUTH_URL: z.url("BETTER_AUTH_URL måste vara en URL").default("http://localhost:3001"),
   PORT: z.coerce.number().int().positive().default(3001),
   CORS_ORIGINS: z.string().default("http://localhost:5173,http://localhost:8081"),
@@ -26,3 +26,8 @@ if (!parsed.success) {
 }
 
 export const env = parsed.data;
+
+/** Tillåtna frontend-origins (CORS_ORIGINS) som en trimmad lista. */
+export const corsOrigins = env.CORS_ORIGINS.split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);

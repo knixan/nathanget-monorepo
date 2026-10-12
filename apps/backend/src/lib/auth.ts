@@ -3,8 +3,8 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { APIError } from "better-auth/api";
 import { username } from "better-auth/plugins";
 import { expo } from "@better-auth/expo";
-import { MIN_AGE, isOldEnough } from "@nathanget/shared-types";
-import { env } from "./env.js";
+import { MIN_AGE, isOldEnough, sexAssignedAtBirthValues } from "@nathanget/shared-types";
+import { corsOrigins, env } from "./env.js";
 import { prisma } from "./prisma.js";
 import { sendEmail } from "./mailer.js";
 
@@ -21,10 +21,17 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
-      void sendEmail({
+      // Inte await: ett långsamt mejl ska inte hänga svaret. Fel loggas så att
+      // en nekad/timeoutad Gmail-sändning inte kraschar processen.
+      sendEmail({
         to: user.email,
         subject: "Bekräfta din e-postadress — Näthänget",
         html: `<p>Klicka för att bekräfta din e-postadress:</p><p><a href="${url}">${url}</a></p>`,
+      }).catch((err) => {
+        console.error(
+          "Kunde inte skicka verifieringsmejl:",
+          err instanceof Error ? err.message : err,
+        );
       });
     },
   },
@@ -39,7 +46,7 @@ export const auth = betterAuth({
         type: "date",
         required: true,
       },
-      // Fritt textfält på auth-nivå; klienten validerar mot tillåtna värden.
+      // Textfält på auth-nivå; värdet valideras mot tillåtna värden i before-hooken nedan.
       sexAssignedAtBirth: {
         type: "string",
         required: true,
@@ -60,6 +67,7 @@ export const auth = betterAuth({
             username?: string | null;
             birthDate?: Date | string | null;
             termsAcceptedAt?: Date | string | null;
+            sexAssignedAtBirth?: string | null;
           };
 
           // Smeknamn (username) är obligatoriskt – username-pluginet tillåter tomt annars.
@@ -75,6 +83,13 @@ export const auth = betterAuth({
             throw new APIError("BAD_REQUEST", {
               message: `Du måste vara minst ${MIN_AGE} år för att skapa ett konto.`,
             });
+          }
+
+          if (
+            !u.sexAssignedAtBirth ||
+            !(sexAssignedAtBirthValues as readonly string[]).includes(u.sexAssignedAtBirth)
+          ) {
+            throw new APIError("BAD_REQUEST", { message: "Ogiltigt val av kön vid födsel." });
           }
 
           // Villkor + integritetspolicy måste vara godkända.
@@ -94,8 +109,7 @@ export const auth = betterAuth({
     expo(),
   ],
   trustedOrigins: [
-    "http://localhost:5173",
-    "http://localhost:8081",
+    ...corsOrigins,
     "nathanget://",
     ...(env.NODE_ENV === "development" ? expoDevelopmentOrigins : []),
   ],

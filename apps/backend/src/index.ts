@@ -1,24 +1,44 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
+import { bodyLimit } from "hono/body-limit";
 import { cors } from "hono/cors";
 import { createMiddleware } from "hono/factory";
+import { secureHeaders } from "hono/secure-headers";
 import { calculateAge, profileSchema } from "@nathanget/shared-types";
-import { env } from "./lib/env.js";
+import { corsOrigins, env } from "./lib/env.js";
 import { prisma } from "./lib/prisma.js";
 import { auth } from "./lib/auth.js";
+import { rateLimit } from "./lib/rate-limit.js";
 
 type Session = NonNullable<Awaited<ReturnType<typeof auth.api.getSession>>>;
 
 const app = new Hono<{ Variables: { session: Session } }>();
 
+app.use("*", secureHeaders());
+app.use(
+  "*",
+  bodyLimit({ maxSize: 100 * 1024, onError: (c) => c.json({ error: "För stor förfrågan" }, 413) }),
+);
+
 // Tillåtna origins för frontend-apparna (kommaseparerade i CORS_ORIGINS).
 app.use(
   "*",
   cors({
-    origin: env.CORS_ORIGINS.split(","),
+    origin: corsOrigins,
     credentials: true,
   }),
 );
+
+// Better Auth har egen rate limiting för /auth/*. Övriga routes begränsas här.
+const apiLimiter = rateLimit({ windowMs: 60_000, max: 120 });
+app.use("/me/*", apiLimiter);
+app.use("/users/*", apiLimiter);
+
+// Läcker aldrig interna fel (t.ex. Prisma) till klienten.
+app.onError((err, c) => {
+  console.error(`${c.req.method} ${c.req.path}:`, err instanceof Error ? err.message : err);
+  return c.json({ error: "Något gick fel" }, 500);
+});
 
 app.all("/auth/*", (c) => auth.handler(c.req.raw));
 
