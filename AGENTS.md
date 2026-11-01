@@ -111,12 +111,14 @@ Användaren vill fräscha upp och fördjupa sina kunskaper medan hen bygger – 
 
 ## Kanban
 
-GitHub Project 18 (`knixan`, "@Projekt-Näthänget"): https://github.com/users/knixan/projects/18. Repo: `knixan/nathanget-monorepo`.
+GitHub Project 18 (`knixan`, "@Projekt-Näthänget"), vyn _Kanban_: https://github.com/users/knixan/projects/18/views/3. Repo `knixan/nathanget-monorepo`.
 
-- Korten är **utkast** (draft issues) i projektet, inte issues i repot. Titeln börjar med område i hakparentes: `[Auth]`, `[Profil]`, `[Säkerhet]`, `[Flaskpost]`, `[Gästbok]`, `[Vänner]`, `[Setup]` … Återanvänd ett befintligt område om det passar.
-- **Börja en uppgift:** ber användaren dig jobba på ett kort – läs kortet (titel + body) först och flytta det till _In Progress_.
-- **När du blir klar:** flytta kortet till _Done_ om allt i det är gjort, annars låt det stå kvar och skriv i bodyn vad som återstår. Skapa nya kort för det som blir kvar eller som du upptäcker (t.ex. buggar, säkerhetsluckor).
-- Flytta inte kort, skapa inte kort och ta inte bort kort utan att användaren har bett om kanban-uppdatering eller att det ingår i uppgiften. Säg vilka kort du har ändrat.
+- Varje kort är en **issue** i repot som ligger i projektet. Titeln börjar med område i hakparentes: `[Auth]`, `[Profil]`, `[Säkerhet]`, `[Flaskpost]`, `[Gästbok]`, `[Vänner]`, `[Setup]` … Återanvänd ett befintligt område om det passar.
+- **Börja en uppgift:** ber användaren dig jobba på ett kort – läs issuen (`gh issue view <nr>`) och flytta kortet till _In Progress_.
+- **När du blir klar:** flytta kortet till _Done_ om allt i det är gjort, annars låt det stå kvar och skriv en kommentar på issuen om vad som återstår. Skapa nya kort för det som blir kvar eller som du upptäcker (t.ex. buggar, säkerhetsluckor).
+- **Commit-meddelandet** nämner issuen: `Closes #<nr>` om kortet är klart, annars `Del av #<nr>`. När användaren pushar till `main` stänger GitHub issuen och projektet flyttar kortet till _Done_ (workflow "Item closed").
+- Skriv issuens body i en fil och använd `--body-file` (långa heredocs i bash går sönder).
+- Flytta inte kort, skapa inte kort och stäng inte issues utan att användaren har bett om kanban-uppdatering eller att det ingår i uppgiften. Säg vilka kort du har ändrat.
 - `/kanban` (`.claude/skills/kanban`) visar tavlan och hjälper till att flytta och skapa kort.
 
 | Vad         | ID                                                                                          |
@@ -125,16 +127,14 @@ GitHub Project 18 (`knixan`, "@Projekt-Näthänget"): https://github.com/users/k
 | Status-fält | `PVTSSF_lAHODHG13M4Bhnqtzhgivlw` – Todo `f75ad846`, In Progress `47fc9ee4`, Done `98236657` |
 
 ```bash
-# Lista korten (id = PVTI_… för status, content.id = DI_… för titel/body)
+# Lista korten (id = PVTI_… används för att byta status)
 gh project item-list 18 --owner knixan --format json --limit 200
 
-# Nytt kort (utkast) – skriv bodyn i en fil först, långa heredocs går sönder
-gh project item-create 18 --owner knixan --title "[Område] Titel" --body "$(cat kort.md)" --format json --jq .id
-
-# Byt status (--id = PVTI_…)
-gh project item-edit --project-id PVT_kwHODHG13M4Bhnqt --id <PVTI-id> \
-  --field-id PVTSSF_lAHODHG13M4Bhnqtzhgivlw --single-select-option-id 98236657
-
-# Ändra titel/body på ett utkast (--id = DI_…)
-gh project item-edit --id <DI-id> --title "[Område] Ny titel" --body "$(cat kort.md)"
+# Nytt kort
+gh issue create -R knixan/nathanget-monorepo --title "[Område] Titel" --body-file kort.md
+gh project item-add 18 --owner knixan --url <issue-url> --format json --jq .id
+gh project item-edit --project-id PVT_kwHODHG13M4Bhnqt --id <item-id> \
+  --field-id PVTSSF_lAHODHG13M4Bhnqtzhgivlw --single-select-option-id f75ad846
 ```
+
+Att sätta status Done stänger issuen automatiskt (workflow "Auto-close issue"), och en stängd issue flyttas till Done ("Item closed"). Nya issues läggs **inte** till i projektet automatiskt – kör alltid `gh project item-add`.

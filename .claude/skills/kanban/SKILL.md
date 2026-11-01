@@ -15,10 +15,10 @@ ID:n, kommandon och regler står i `AGENTS.md` § Kanban. Läs den delen först.
 | `/kanban nästa`          | Föreslå nästa kort att jobba på, med motivering.                             |
 | `/kanban börja <sökord>` | Flytta kortet till _In Progress_, läs det och sammanfatta vad som ska göras. |
 | `/kanban klar <sökord>`  | Flytta kortet till _Done_.                                                   |
-| `/kanban nytt <titel>`   | Skapa ett utkast. Saknas `[Område]` – föreslå ett.                           |
+| `/kanban nytt <titel>`   | Skapa en issue och lägg den i Todo. Saknas `[Område]` – föreslå ett.         |
 | `/kanban städa`          | Jämför _In Progress_ med koden och föreslå vad som kan flyttas.              |
 
-`<sökord>` matchas mot titeln (skiftlägesokänsligt). Matchar flera kort – fråga vilket.
+`<sökord>` är ett issuenummer (`12`, `#12`) eller matchas mot titeln (skiftlägesokänsligt). Matchar flera kort – fråga vilket.
 
 ## Visa tavlan
 
@@ -38,6 +38,7 @@ ID:n, kommandon och regler står i `AGENTS.md` § Kanban. Läs den delen först.
 ## Ändra kort
 
 - Visa vad du tänker ändra innan du ändrar fler än ett kort i taget.
-- Utkastens id: `id` (`PVTI_…`) används för status, `content.id` (`DI_…`) för titel och body.
-- Skriv långa bodies i en fil i scratchpad och skicka med `--body "$(cat fil.md)"`.
-- Bekräfta efteråt med en rad per kort: `[Område] Titel: Todo → In Progress`.
+- Korten är issues: `id` (`PVTI_…`) används för status, `content.number` för `gh issue view/edit/comment`.
+- Ett kort i listan som fortfarande är `DraftIssue` (inte gjort om till issue) – säg till användaren i stället för att ändra det.
+- Skriv långa bodies och kommentarer i en fil i scratchpad och använd `--body-file`.
+- Bekräfta efteråt med en rad per kort: `#12 [Område] Titel: Todo → In Progress`.
