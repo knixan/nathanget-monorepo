@@ -33,21 +33,28 @@ Ett socialt nätverk för unga (från **13 år**). Säkerhet för minderåriga g
 
 ## Dokumentation – gissa inte
 
-Versionerna är nyare än det du lärt dig. Slå upp i dokumentationen innan du använder ett API du är osäker på, och **alltid** när det gäller auth, databas eller säkerhet. Läs bara den sida som behövs.
+Versionerna är nyare än det du lärt dig. Slå upp i dokumentationen innan du använder ett API du är osäker på, och **alltid** när det gäller auth, databas eller säkerhet.
 
-| Bibliotek    | Version | Dokumentation                                                       |
-| ------------ | ------- | ------------------------------------------------------------------- |
-| Hono         | 4.13    | https://hono.dev/llms.txt                                           |
-| better-auth  | 1.7     | https://www.better-auth.com/llms.txt                                |
-| Prisma       | **6**   | https://www.prisma.io/llms.txt (inte Prisma 7)                      |
-| zod          | 4       | https://zod.dev/llms.txt                                            |
-| TanStack     | –       | https://tanstack.com/llms.txt (Router 1.170, Query 5)               |
-| Vite         | 8       | https://vite.dev/llms.txt                                           |
-| Expo         | 57      | https://docs.expo.dev/versions/v57.0.0/ och `apps/mobile/AGENTS.md` |
-| shadcn/ui    | –       | https://ui.shadcn.com/llms.txt                                      |
-| Tailwind CSS | 4       | https://tailwindcss.com/docs (ingen llms.txt)                       |
-| Vitest       | 4       | https://vitest.dev/llms.txt                                         |
-| Turborepo    | 2       | https://turborepo.com/llms.txt                                      |
+- **`llms.txt` är en innehållsförteckning.** Hämta den, hitta rätt sida och hämta bara den sidan (oftast finns en `.md`-version). Hämta aldrig `llms-full.txt` – den är hundratals KB och fyller sammanhanget med sådant som inte behövs.
+- **Kolla versionen.** Dokumentationen beskriver oftast senaste versionen. Stämmer den inte med tabellen – leta efter en versionerad sida eller säg till.
+
+Sorterat efter hur mycket biblioteket används i projektet:
+
+| Bibliotek    | Version | Används i       | Dokumentation                                                                                                                 |
+| ------------ | ------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| better-auth  | 1.7     | alla tre appar  | https://better-auth.com/docs/llms.txt (1.7 = "Latest"; byts den till 1.8 – se versionerna i https://better-auth.com/llms.txt) |
+| zod          | 4       | alla + shared   | https://zod.dev/llms.txt                                                                                                      |
+| Hono         | 4.13    | backend         | https://hono.dev/llms.txt                                                                                                     |
+| Prisma       | **6**   | backend         | https://www.prisma.io/llms.txt – beskriver Prisma 7. Vi kör 6: ingen `prisma.config.ts`, generator `prisma-client-js`         |
+| React Native | 0.86    | mobile          | https://reactnative.dev/llms.txt                                                                                              |
+| Expo         | 57      | mobile          | https://docs.expo.dev/llms.txt + https://docs.expo.dev/versions/v57.0.0/ och `apps/mobile/AGENTS.md`                          |
+| TanStack     | –       | web, mobile     | https://tanstack.com/llms.txt (Router 1.170 i web, Query 5 i web och mobile)                                                  |
+| shadcn/ui    | –       | web             | https://ui.shadcn.com/llms.txt                                                                                                |
+| Vite         | 8       | web             | https://vite.dev/llms.txt                                                                                                     |
+| Tailwind CSS | 4       | web             | https://tailwindcss.com/docs (ingen llms.txt)                                                                                 |
+| Nodemailer   | 10      | backend         | https://nodemailer.com/about/ (ingen llms.txt)                                                                                |
+| Vitest       | 4       | backend, shared | https://vitest.dev/llms.txt                                                                                                   |
+| Turborepo    | 2       | repo            | https://turborepo.com/llms.txt                                                                                                |
 
 ## Kommandon
 

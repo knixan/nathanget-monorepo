@@ -115,15 +115,30 @@ pnpm --filter @nathanget/backend exec vitest     # backend i watch-läge
 
 ## AI-agenter
 
-Regler för AI-agenter (Claude Code m.fl.) står i [`AGENTS.md`](AGENTS.md) – struktur,
-säkerhetsregler, dokumentationslänkar, vad "klart" betyder och hur kanban-tavlan
-([GitHub Project 18](https://github.com/users/knixan/projects/18)) hålls uppdaterad.
+Regler för AI-agenter (Claude Code m.fl.) står i [`AGENTS.md`](AGENTS.md): struktur,
+säkerhetsregler för minderåriga, dokumentationslänkar (`llms.txt` per bibliotek och
+version), vad "klart" betyder, git, databas och kanban. `CLAUDE.md` pekar på samma fil.
 
-- `.claude/hooks/` – stoppar `git commit`/`git push` från agenter och formaterar + lintar
-  varje fil agenten ändrar.
+- `.claude/hooks/` – stoppar `git commit`/`git push` från agenter (användaren committar
+  själv) och formaterar med Prettier + lintar (oxlint i web, eslint i mobile) varje fil
+  agenten ändrar.
 - `/kanban` – visar tavlan, föreslår nästa kort och flyttar/skapar kort.
 - Lärande: efter större uppgifter avslutar agenten med ett kort "Lär dig"-block med frågor.
   Loggen (`.claude/larande/`) och `/quiz` är privata och ligger i `.gitignore`.
+
+### Kanban
+
+Tavlan är [GitHub Project 18](https://github.com/users/knixan/projects/18/views/3). Varje
+kort är en issue i det här repot med område i titeln, t.ex. `[Säkerhet] Rapporteringsfunktion`.
+
+| Händelse                                  | Vad som händer på tavlan                     |
+| ----------------------------------------- | -------------------------------------------- |
+| En issue skapas i repot                   | Läggs till i _Todo_ (workflow "Auto-add")    |
+| Agenten börjar på ett kort                | Flyttas till _In Progress_                   |
+| En commit med `Closes #23` pushas på main | Issuen stängs och kortet flyttas till _Done_ |
+| Ett kort sätts till _Done_                | Issuen stängs (workflow "Auto-close issue")  |
+
+Skriv `Del av #23` i commit-meddelandet om kortet inte är helt klart.
 
 ## Databas (Prisma)
 
