@@ -3,10 +3,10 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { APIError } from "better-auth/api";
 import { username } from "better-auth/plugins";
 import { expo } from "@better-auth/expo";
-import { MIN_AGE, isOldEnough, sexAssignedAtBirthValues } from "@nathanget/shared-types";
 import { corsOrigins, env } from "./env.js";
 import { prisma } from "./prisma.js";
 import { sendEmail } from "./mailer.js";
+import { type NewUserInput, validateNewUser } from "./user-rules.js";
 
 const expoDevelopmentOrigins = ["exp://", "exp://**", "exp://192.168.*.*:*/**"];
 
@@ -62,43 +62,10 @@ export const auth = betterAuth({
     user: {
       create: {
         // Serversidan har sista ordet (klientvalidering går att kringgå).
+        // Själva reglerna ligger i user-rules.ts så att de går att testa.
         before: async (user) => {
-          const u = user as typeof user & {
-            username?: string | null;
-            birthDate?: Date | string | null;
-            termsAcceptedAt?: Date | string | null;
-            sexAssignedAtBirth?: string | null;
-          };
-
-          // Smeknamn (username) är obligatoriskt – username-pluginet tillåter tomt annars.
-          if (!u.username || u.username.trim().length < 2) {
-            throw new APIError("BAD_REQUEST", { message: "Smeknamn krävs." });
-          }
-
-          const birthDate = u.birthDate ? new Date(u.birthDate) : null;
-          if (!birthDate || Number.isNaN(birthDate.getTime())) {
-            throw new APIError("BAD_REQUEST", { message: "Ogiltigt födelsedatum." });
-          }
-          if (!isOldEnough(birthDate)) {
-            throw new APIError("BAD_REQUEST", {
-              message: `Du måste vara minst ${MIN_AGE} år för att skapa ett konto.`,
-            });
-          }
-
-          if (
-            !u.sexAssignedAtBirth ||
-            !(sexAssignedAtBirthValues as readonly string[]).includes(u.sexAssignedAtBirth)
-          ) {
-            throw new APIError("BAD_REQUEST", { message: "Ogiltigt val av kön vid födsel." });
-          }
-
-          // Villkor + integritetspolicy måste vara godkända.
-          const acceptedAt = u.termsAcceptedAt ? new Date(u.termsAcceptedAt) : null;
-          if (!acceptedAt || Number.isNaN(acceptedAt.getTime())) {
-            throw new APIError("BAD_REQUEST", {
-              message: "Du måste godkänna villkoren och integritetspolicyn.",
-            });
-          }
+          const error = validateNewUser(user as typeof user & NewUserInput);
+          if (error) throw new APIError("BAD_REQUEST", { message: error });
         },
       },
     },

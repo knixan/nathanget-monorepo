@@ -4,11 +4,12 @@ import { bodyLimit } from "hono/body-limit";
 import { cors } from "hono/cors";
 import { createMiddleware } from "hono/factory";
 import { secureHeaders } from "hono/secure-headers";
-import { calculateAge, profileSchema } from "@nathanget/shared-types";
+import { profileSchema } from "@nathanget/shared-types";
 import { corsOrigins, env } from "./lib/env.js";
 import { prisma } from "./lib/prisma.js";
 import { auth } from "./lib/auth.js";
 import { rateLimit } from "./lib/rate-limit.js";
+import { toPublicProfile } from "./lib/user-rules.js";
 
 type Session = NonNullable<Awaited<ReturnType<typeof auth.api.getSession>>>;
 
@@ -131,8 +132,7 @@ app.get("/users/:username", requireAuth, async (c) => {
   if (!user) return c.json({ error: "Profilen finns inte" }, 404);
 
   // Exakt födelsedatum lämnas aldrig ut – bara åldern.
-  const { birthDate, ...rest } = user;
-  return c.json({ ...rest, age: calculateAge(birthDate) });
+  return c.json(toPublicProfile(user));
 });
 
 serve({ fetch: app.fetch, port: env.PORT }, (info) => {

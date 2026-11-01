@@ -11,3 +11,8 @@ dist/
 apps/mobile/.expo/
 apps/backend/generated/
 coverage/
+
+# Privat lärande (AGENTS.md § Lärande): lärlogg och /quiz-skill
+.claude/larande/
+.claude/skills/quiz/
+.claude/settings.local.json

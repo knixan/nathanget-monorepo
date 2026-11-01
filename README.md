@@ -100,7 +100,30 @@ Alla kör via Turborepo över hela workspacet:
 | `pnpm build`     | Bygger alla paket             |
 | `pnpm lint`      | Lintar alla paket             |
 | `pnpm typecheck` | Typkollar alla paket          |
-| `pnpm test`      | Kör tester                    |
+| `pnpm test`      | Kör tester (vitest)           |
+
+## Tester
+
+Vitest körs i `packages/shared-types` (zod-scheman, åldersberäkning) och `apps/backend`
+(regler för registrering och publik profil i `src/lib/user-rules.ts`, rate limiting).
+Regler som ska testas läggs som rena funktioner utan databas – se `AGENTS.md`.
+
+```bash
+pnpm test                                        # alla
+pnpm --filter @nathanget/backend exec vitest     # backend i watch-läge
+```
+
+## AI-agenter
+
+Regler för AI-agenter (Claude Code m.fl.) står i [`AGENTS.md`](AGENTS.md) – struktur,
+säkerhetsregler, dokumentationslänkar, vad "klart" betyder och hur kanban-tavlan
+([GitHub Project 18](https://github.com/users/knixan/projects/18)) hålls uppdaterad.
+
+- `.claude/hooks/` – stoppar `git commit`/`git push` från agenter och formaterar + lintar
+  varje fil agenten ändrar.
+- `/kanban` – visar tavlan, föreslår nästa kort och flyttar/skapar kort.
+- Lärande: efter större uppgifter avslutar agenten med ett kort "Lär dig"-block med frågor.
+  Loggen (`.claude/larande/`) och `/quiz` är privata och ligger i `.gitignore`.
 
 ## Databas (Prisma)
 
