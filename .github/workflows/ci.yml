@@ -1,5 +1,5 @@
 # fetch-depth: 0 — Turborepo måste kunna jämföra mot tidigare commits för att räkna ut vad som ändrats; ett standard shallow-checkout (senaste commiten) räcker inte.
-# DATABASE_URL i Prisma-steget är en påhittad platshållare, inte en riktig hemlighet — prisma generate kopplar aldrig upp mot databasen, den bara läser schema-filen, men klagar om variabeln saknas helt.
+# DATABASE_URL i Prisma-stegen är en påhittad platshållare, inte en riktig hemlighet — prisma generate/validate kopplar aldrig upp mot databasen, de bara läser schema-filen. Sedan Prisma 7 behövs den egentligen inte (prisma.config.ts faller tillbaka på ""), men den skadar inte.
 # --filter="...[ref]" — ... betyder "plus allt som beror på de ändrade paketen", [ref] är jämförelsepunkten (föregående commit vid push till main, PR:ens bas-branch vid pull request).
 name: CI
 

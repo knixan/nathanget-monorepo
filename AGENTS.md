@@ -8,7 +8,7 @@ Ett socialt nätverk för unga (från **13 år**). Säkerhet för minderåriga g
 
 | Del                     | Teknik                                                                |
 | ----------------------- | --------------------------------------------------------------------- |
-| `apps/backend`          | Hono, Better Auth, Prisma 6 (PostgreSQL/Neon), Nodemailer             |
+| `apps/backend`          | Hono, Better Auth, Prisma 7 (PostgreSQL/Neon), Nodemailer             |
 | `apps/web`              | Vite, React 19, TanStack Router + Query, Tailwind v4, shadcn, oxlint  |
 | `apps/mobile`           | Expo 57 (React Native), expo-router – **läs `apps/mobile/AGENTS.md`** |
 | `packages/shared-types` | zod-scheman, typer och konstanter som delas av backend, web och mobil |
@@ -40,21 +40,21 @@ Versionerna är nyare än det du lärt dig. Slå upp i dokumentationen innan du 
 
 Sorterat efter hur mycket biblioteket används i projektet:
 
-| Bibliotek    | Version | Används i       | Dokumentation                                                                                                                 |
-| ------------ | ------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| better-auth  | 1.7     | alla tre appar  | https://better-auth.com/docs/llms.txt (1.7 = "Latest"; byts den till 1.8 – se versionerna i https://better-auth.com/llms.txt) |
-| zod          | 4       | alla + shared   | https://zod.dev/llms.txt                                                                                                      |
-| Hono         | 4.13    | backend         | https://hono.dev/llms.txt                                                                                                     |
-| Prisma       | **6**   | backend         | https://www.prisma.io/llms.txt – beskriver Prisma 7. Vi kör 6: ingen `prisma.config.ts`, generator `prisma-client-js`         |
-| React Native | 0.86    | mobile          | https://reactnative.dev/llms.txt                                                                                              |
-| Expo         | 57      | mobile          | https://docs.expo.dev/llms.txt + https://docs.expo.dev/versions/v57.0.0/ och `apps/mobile/AGENTS.md`                          |
-| TanStack     | –       | web, mobile     | https://tanstack.com/llms.txt (Router 1.170 i web, Query 5 i web och mobile)                                                  |
-| shadcn/ui    | –       | web             | https://ui.shadcn.com/llms.txt                                                                                                |
-| Vite         | 8       | web             | https://vite.dev/llms.txt                                                                                                     |
-| Tailwind CSS | 4       | web             | https://tailwindcss.com/docs (ingen llms.txt)                                                                                 |
-| Nodemailer   | 10      | backend         | https://nodemailer.com/about/ (ingen llms.txt)                                                                                |
-| Vitest       | 4       | backend, shared | https://vitest.dev/llms.txt                                                                                                   |
-| Turborepo    | 2       | repo            | https://turborepo.com/llms.txt                                                                                                |
+| Bibliotek    | Version | Används i       | Dokumentation                                                                                                                       |
+| ------------ | ------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| better-auth  | 1.7     | alla tre appar  | https://better-auth.com/docs/llms.txt (1.7 = "Latest"; byts den till 1.8 – se versionerna i https://better-auth.com/llms.txt)       |
+| zod          | 4       | alla + shared   | https://zod.dev/llms.txt                                                                                                            |
+| Hono         | 4.13    | backend         | https://hono.dev/llms.txt                                                                                                           |
+| Prisma       | 7.10    | backend         | https://www.prisma.io/docs/llms.txt (v7-sidor ligger under `/docs/orm/v7/`). Inte 8 – den är RC, fast npm-taggen `latest` pekar dit |
+| React Native | 0.86    | mobile          | https://reactnative.dev/llms.txt                                                                                                    |
+| Expo         | 57      | mobile          | https://docs.expo.dev/llms.txt + https://docs.expo.dev/versions/v57.0.0/ och `apps/mobile/AGENTS.md`                                |
+| TanStack     | –       | web, mobile     | https://tanstack.com/llms.txt (Router 1.170 i web, Query 5 i web och mobile)                                                        |
+| shadcn/ui    | –       | web             | https://ui.shadcn.com/llms.txt                                                                                                      |
+| Vite         | 8       | web             | https://vite.dev/llms.txt                                                                                                           |
+| Tailwind CSS | 4       | web             | https://tailwindcss.com/docs (ingen llms.txt)                                                                                       |
+| Nodemailer   | 10      | backend         | https://nodemailer.com/about/ (ingen llms.txt)                                                                                      |
+| Vitest       | 4       | backend, shared | https://vitest.dev/llms.txt                                                                                                         |
+| Turborepo    | 2       | repo            | https://turborepo.com/llms.txt                                                                                                      |
 
 ## Kommandon
 
@@ -112,7 +112,8 @@ Användaren vill fräscha upp och fördjupa sina kunskaper medan hen bygger – 
 
 ## Databas
 
-- Ett schema: `apps/backend/prisma/schema.prisma`. Better Auth-modellerna (`user`, `session`, `account`, `verification`) har extrafält – ändra dem i både schemat och `user.additionalFields` i `lib/auth.ts` (och `inferAdditionalFields` i webbens `auth-client.ts`).
+- Ett schema: `apps/backend/prisma/schema.prisma`. Prisma 7: anslutningen ligger i `apps/backend/prisma.config.ts`, klienten genereras till `src/generated/prisma` (gitignore) och importeras från `../generated/prisma/client.js` – aldrig från `@prisma/client`. `lib/prisma.ts` använder driver adaptern `PrismaPg`.
+- Better Auth-modellerna (`user`, `session`, `account`, `verification`) har extrafält – ändra dem i både schemat och `user.additionalFields` i `lib/auth.ts` (och `inferAdditionalFields` i webbens `auth-client.ts`).
 - Säg till innan en migrering raderar eller ändrar befintlig data. Föredra att lägga till kolumner (nullable eller med default) framför att döpa om eller droppa.
 - `prisma migrate reset` kräver alltid uttryckligt godkännande från användaren i ett nytt meddelande.
 

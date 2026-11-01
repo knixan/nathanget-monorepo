@@ -9,7 +9,7 @@ dist/
 .DS_Store
 .expo/
 apps/mobile/.expo/
-apps/backend/generated/
+apps/backend/src/generated/
 coverage/
 
 # Privat lärande (AGENTS.md § Lärande): lärlogg och /quiz-skill

@@ -1,11 +1,16 @@
-
+// Prisma 7: klienten genereras som TypeScript i src/ (inte i node_modules) så att
+// tsc bygger den tillsammans med resten. Importera från "./generated/prisma/client.js".
+// .js i importerna eftersom backend kompileras med NodeNext och körs som ESM.
 generator client {
-  provider = "prisma-client-js"
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
 }
 
+// Anslutningen (DATABASE_URL) ligger i prisma.config.ts.
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {

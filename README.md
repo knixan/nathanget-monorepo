@@ -9,7 +9,7 @@ hanterat med [Turborepo](https://turbo.build/) och [pnpm workspaces](https://pnp
 | ----------------------------------- | ---------------------------------------------------------------------------------------------- |
 | **Web** (`apps/web`)                | Vite 8, React 19, TanStack Router + Query, Tailwind v4, shadcn/Radix UI, react-hook-form + zod |
 | **Mobile** (`apps/mobile`)          | Expo (React Native 0.86), expo-router, TanStack Query, react-hook-form + zod                   |
-| **Backend** (`apps/backend`)        | Hono, Better Auth, Prisma (PostgreSQL/Neon), Nodemailer (Gmail SMTP)                           |
+| **Backend** (`apps/backend`)        | Hono, Better Auth, Prisma 7 (PostgreSQL/Neon), Nodemailer (Gmail SMTP)                         |
 | **Delat** (`packages/shared-types`) | Delade TypeScript-typer (`@nathanget/shared-types`)                                            |
 | **Verktyg**                         | pnpm 9, Turborepo, TypeScript, oxlint                                                          |
 
@@ -158,6 +158,10 @@ pnpm --filter @nathanget/backend prisma:generate   # generera klient
 pnpm --filter @nathanget/backend prisma:migrate    # skapa/köra migrering
 pnpm --filter @nathanget/backend prisma:studio     # öppna Prisma Studio
 ```
+
+Prisma 7: anslutningen (`DATABASE_URL`) läses av `apps/backend/prisma.config.ts` via dotenv, och
+klienten genereras som TypeScript till `apps/backend/src/generated/prisma` (ligger i `.gitignore`).
+Backend ansluter med driver adaptern `@prisma/adapter-pg` (se `src/lib/prisma.ts`).
 
 > Efter en ren `pnpm install` måste `prisma:generate` köras innan backend typkollar/bygger.
 
